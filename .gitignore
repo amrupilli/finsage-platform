@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# FastAPI / local database
+*.sqlite3
+
+# Node / frontend
+node_modules/
+dist/
+coverage/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Logs
+*.log
