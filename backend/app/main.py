@@ -1,6 +1,9 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
+from app.db.database import get_db
 
 settings = get_settings()
 
@@ -18,3 +21,9 @@ def health_check() -> dict[str, str | bool]:
         "app_name": settings.app_name,
         "debug": settings.debug,
     }
+
+
+@app.get("/health/db")
+def database_health_check(db: Session = Depends(get_db)) -> dict[str, str]:
+    db.execute(text("SELECT 1"))
+    return {"database_status": "ok"}
