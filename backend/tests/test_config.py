@@ -8,3 +8,6 @@ def test_settings_load_correctly() -> None:
     assert settings.app_version == "0.1.0"
     assert settings.debug is True
     assert "finsage_db" in settings.database_url
+    assert settings.secret_key != ""
+    assert settings.algorithm == "HS256"
+    assert settings.access_token_expire_minutes == 60

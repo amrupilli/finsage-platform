@@ -57,3 +57,61 @@ def test_register_user_duplicate_email() -> None:
     assert second_response.json() == {
         "detail": "A user with this email already exists."
     }
+
+
+def test_login_user_success() -> None:
+    unique_email = f"login_{uuid.uuid4().hex[:8]}@example.com"
+    password = "securepass123"
+
+    register_response = client.post(
+        "/auth/register",
+        json={
+            "email": unique_email,
+            "full_name": "Login User",
+            "password": password,
+        },
+    )
+
+    assert register_response.status_code == 201
+
+    login_response = client.post(
+        "/auth/login",
+        json={
+            "email": unique_email,
+            "password": password,
+        },
+    )
+
+    assert login_response.status_code == 200
+
+    data = login_response.json()
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
+
+
+def test_login_user_invalid_password() -> None:
+    unique_email = f"wrongpass_{uuid.uuid4().hex[:8]}@example.com"
+
+    register_response = client.post(
+        "/auth/register",
+        json={
+            "email": unique_email,
+            "full_name": "Wrong Password User",
+            "password": "securepass123",
+        },
+    )
+
+    assert register_response.status_code == 201
+
+    login_response = client.post(
+        "/auth/login",
+        json={
+            "email": unique_email,
+            "password": "wrongpass123",
+        },
+    )
+
+    assert login_response.status_code == 401
+    assert login_response.json() == {
+        "detail": "Invalid email or password."
+    }
