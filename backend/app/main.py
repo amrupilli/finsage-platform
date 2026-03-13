@@ -2,6 +2,7 @@ from fastapi import Depends, FastAPI
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.api.auth import router as auth_router
 from app.core.config import get_settings
 from app.db.database import get_db
 
@@ -12,6 +13,8 @@ app = FastAPI(
     description="Backend API for the Finsage educational digital investing platform.",
     version=settings.app_version,
 )
+
+app.include_router(auth_router)
 
 
 @app.get("/health")
