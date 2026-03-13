@@ -47,3 +47,11 @@ class OnboardingNextMessageResponse(BaseModel):
     current_stage: ConversationStage
     missing_fields: list[str]
     is_completed: bool
+
+
+class OnboardingStartResponse(BaseModel):
+    session_id: int
+    assistant_message: str
+    current_stage: ConversationStage
+    missing_fields: list[str]
+    is_completed: bool
