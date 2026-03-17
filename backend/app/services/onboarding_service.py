@@ -2,7 +2,12 @@ from sqlalchemy.orm import Session
 
 from app.models.onboarding import OnboardingAnswer, OnboardingSession
 from app.schemas.onboarding import ConversationStage
-from app.services.onboarding_state import FIELD_BY_STAGE, get_initial_collected_fields
+from app.services.onboarding_state import (
+    FIELD_BY_STAGE,
+    get_current_question_stage,
+    get_initial_collected_fields,
+    get_missing_fields,
+)
 
 
 def create_onboarding_session(db: Session, user_id: int) -> OnboardingSession:
@@ -55,7 +60,7 @@ def get_session_answers(
     return (
         db.query(OnboardingAnswer)
         .filter(OnboardingAnswer.session_id == session_id)
-        .order_by(OnboardingAnswer.created_at.asc())
+        .order_by(OnboardingAnswer.created_at.asc(), OnboardingAnswer.id.asc())
         .all()
     )
 
@@ -71,6 +76,18 @@ def build_collected_fields_from_answers(
             collected_fields[field_name] = answer.answer_text
 
     return collected_fields
+
+
+def get_onboarding_state_snapshot(
+    answers: list[OnboardingAnswer],
+) -> tuple[ConversationStage, dict[str, str | None], list[str], bool]:
+    collected_fields = build_collected_fields_from_answers(answers)
+    missing_fields = get_missing_fields(collected_fields)
+
+    current_stage = get_current_question_stage(len(answers))
+    is_completed = current_stage == "complete"
+
+    return current_stage, collected_fields, missing_fields, is_completed
 
 
 def mark_onboarding_session_completed(

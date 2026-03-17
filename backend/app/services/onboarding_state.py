@@ -18,6 +18,14 @@ FIELD_BY_STAGE = {
     "risk_attitude": "risk_attitude",
 }
 
+QUESTION_STAGES: list[ConversationStage] = [
+    "goal",
+    "experience",
+    "budget",
+    "time_horizon",
+    "risk_attitude",
+]
+
 
 def get_initial_collected_fields() -> dict[str, str | None]:
     return {
@@ -38,5 +46,12 @@ def get_next_stage(current_stage: ConversationStage) -> ConversationStage:
 
     if current_index + 1 < len(STAGE_ORDER):
         return STAGE_ORDER[current_index + 1]
+
+    return "complete"
+
+
+def get_current_question_stage(answer_count: int) -> ConversationStage:
+    if answer_count < len(QUESTION_STAGES):
+        return QUESTION_STAGES[answer_count]
 
     return "complete"

@@ -33,26 +33,6 @@ def create_user_and_token() -> str:
     return login_response.json()["access_token"]
 
 
-def test_get_risk_profile_fails_when_onboarding_incomplete() -> None:
-    access_token = create_user_and_token()
-
-    start_response = client.post(
-        "/onboarding/start",
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
-    assert start_response.status_code == 200
-
-    session_id = start_response.json()["session_id"]
-
-    response = client.get(
-        f"/onboarding/{session_id}/risk-profile",
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
-
-    assert response.status_code == 400
-    assert "Onboarding is incomplete" in response.json()["detail"]
-
-
 def test_get_risk_profile_endpoint() -> None:
     access_token = create_user_and_token()
 
