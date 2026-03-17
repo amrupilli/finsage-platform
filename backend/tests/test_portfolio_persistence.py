@@ -2,22 +2,22 @@ import uuid
 
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.db.database import SessionLocal
-from app.models.risk_profile import RiskProfileSnapshot
+from app.main import app
+from app.models.portfolio import PortfolioScenarioSnapshot
 
 client = TestClient(app)
 
 
 def create_user_and_token() -> str:
-    unique_email = f"riskprofile_{uuid.uuid4().hex[:8]}@example.com"
+    unique_email = f"portfolio_persist_{uuid.uuid4().hex[:8]}@example.com"
     password = "securepass123"
 
     register_response = client.post(
         "/auth/register",
         json={
             "email": unique_email,
-            "full_name": "Risk Profile User",
+            "full_name": "Portfolio Persistence User",
             "password": password,
         },
     )
@@ -35,7 +35,7 @@ def create_user_and_token() -> str:
     return login_response.json()["access_token"]
 
 
-def test_risk_profile_snapshot_is_saved_to_database() -> None:
+def test_portfolio_scenario_snapshot_is_saved_to_database() -> None:
     access_token = create_user_and_token()
 
     start_response = client.post(
@@ -49,7 +49,7 @@ def test_risk_profile_snapshot_is_saved_to_database() -> None:
     messages = [
         "I want to learn safely",
         "I am a beginner",
-        "Around 100 pounds",
+        "100 pounds",
         "Short term",
         "I would panic and sell",
     ]
@@ -68,19 +68,25 @@ def test_risk_profile_snapshot_is_saved_to_database() -> None:
     )
     assert risk_response.status_code == 200
 
+    portfolio_response = client.get(
+        f"/onboarding/{session_id}/portfolio-scenario",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert portfolio_response.status_code == 200
+
     db = SessionLocal()
     try:
         snapshot = (
-            db.query(RiskProfileSnapshot)
-            .filter(RiskProfileSnapshot.session_id == session_id)
+            db.query(PortfolioScenarioSnapshot)
+            .filter(PortfolioScenarioSnapshot.session_id == session_id)
             .first()
         )
 
         assert snapshot is not None
-        assert snapshot.profile_label == "Conservative"
-        assert snapshot.total_score >= 0
+        assert snapshot.portfolio_type == "Conservative Learning Portfolio"
+        assert snapshot.total_budget == 100.0
         assert snapshot.summary != ""
-        assert isinstance(snapshot.dimension_scores, list)
-        assert len(snapshot.dimension_scores) == 5
+        assert isinstance(snapshot.allocations, list)
+        assert len(snapshot.allocations) == 3
     finally:
         db.close()

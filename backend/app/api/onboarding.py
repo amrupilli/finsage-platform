@@ -5,6 +5,8 @@ from app.services.risk_profile_service import generate_risk_profile
 from app.services.risk_profile_persistence import save_risk_profile_snapshot
 from app.api.deps import get_current_user
 from app.db.database import get_db
+from app.schemas.portfolio import PortfolioScenarioResult
+from app.services.portfolio_service import generate_portfolio_for_session
 from app.models.user import User
 from app.schemas.onboarding import (
     OnboardingMessageCreate,
@@ -156,3 +158,11 @@ def get_risk_profile(
     save_risk_profile_snapshot(db, session.id, risk_profile)
 
     return risk_profile
+
+@router.get("/{session_id}/portfolio-scenario", response_model=PortfolioScenarioResult)
+def get_portfolio_scenario(
+    session_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> PortfolioScenarioResult:
+    return generate_portfolio_for_session(db, session_id, current_user.id)

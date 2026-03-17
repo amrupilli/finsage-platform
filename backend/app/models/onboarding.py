@@ -1,10 +1,11 @@
 from datetime import datetime
-
+from typing import TYPE_CHECKING
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from app.db.base import Base
-
+if TYPE_CHECKING:
+    from app.models.risk_profile import RiskProfileSnapshot
+    from app.models.portfolio import PortfolioScenarioSnapshot
 
 class OnboardingSession(Base):
     __tablename__ = "onboarding_sessions"
@@ -19,6 +20,17 @@ class OnboardingSession(Base):
         cascade="all, delete-orphan",
     )
 
+
+    risk_profile_snapshot: Mapped["RiskProfileSnapshot | None"] = relationship(
+    back_populates="session",
+    uselist=False,
+    cascade="all, delete-orphan",
+)
+    portfolio_scenario_snapshot: Mapped["PortfolioScenarioSnapshot | None"] = relationship(
+    back_populates="session",
+    uselist=False,
+    cascade="all, delete-orphan",
+)
 
 class OnboardingAnswer(Base):
     __tablename__ = "onboarding_answers"

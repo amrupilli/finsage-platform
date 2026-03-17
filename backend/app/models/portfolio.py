@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -10,8 +10,8 @@ if TYPE_CHECKING:
     from app.models.onboarding import OnboardingSession
 
 
-class RiskProfileSnapshot(Base):
-    __tablename__ = "risk_profile_snapshots"
+class PortfolioScenarioSnapshot(Base):
+    __tablename__ = "portfolio_scenario_snapshots"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
@@ -21,10 +21,10 @@ class RiskProfileSnapshot(Base):
         unique=True,
     )
 
-    profile_label: Mapped[str] = mapped_column(String, nullable=False)
-    total_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    portfolio_type: Mapped[str] = mapped_column(String, nullable=False)
+    total_budget: Mapped[float] = mapped_column(Float, nullable=False)
     summary: Mapped[str] = mapped_column(Text, nullable=False)
-    dimension_scores: Mapped[list] = mapped_column(JSON, nullable=False)
+    allocations: Mapped[list] = mapped_column(JSON, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
@@ -33,5 +33,5 @@ class RiskProfileSnapshot(Base):
     )
 
     session: Mapped["OnboardingSession"] = relationship(
-        back_populates="risk_profile_snapshot"
+        back_populates="portfolio_scenario_snapshot"
     )
