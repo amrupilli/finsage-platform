@@ -5,6 +5,8 @@ from app.services.risk_profile_service import generate_risk_profile
 from app.services.risk_profile_persistence import save_risk_profile_snapshot
 from app.api.deps import get_current_user
 from app.db.database import get_db
+from app.schemas.simulation import PortfolioSimulationResult
+from app.services.simulation_service import generate_simulation_for_session
 from app.schemas.portfolio import PortfolioScenarioResult
 from app.services.portfolio_service import generate_portfolio_for_session
 from app.models.user import User
@@ -166,3 +168,11 @@ def get_portfolio_scenario(
     current_user: User = Depends(get_current_user),
 ) -> PortfolioScenarioResult:
     return generate_portfolio_for_session(db, session_id, current_user.id)
+
+@router.get("/{session_id}/simulation", response_model=PortfolioSimulationResult)
+def get_portfolio_simulation(
+    session_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> PortfolioSimulationResult:
+    return generate_simulation_for_session(db, session_id, current_user.id)

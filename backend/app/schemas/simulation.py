@@ -20,10 +20,18 @@ class SimulationPathPoint(BaseModel):
     portfolio_value: float
 
 
+class SimulationBandPoint(BaseModel):
+    step: int
+    p10: float
+    p50: float
+    p90: float
+
+
 class PortfolioSimulationResult(BaseModel):
     initial_budget: float
     num_simulations: int
     time_horizon_months: int
     metrics: SimulationMetrics
     sample_path: list[SimulationPathPoint]
+    percentile_band: list[SimulationBandPoint]
     summary: str
