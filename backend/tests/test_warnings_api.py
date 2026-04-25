@@ -43,6 +43,7 @@ def test_scam_check_requires_authentication() -> None:
 
 def test_scam_check_returns_prediction_for_authenticated_user() -> None:
     headers = register_and_login_user()
+    
 
     response = client.post(
         "/warnings/scam-check",
@@ -64,3 +65,7 @@ def test_scam_check_returns_prediction_for_authenticated_user() -> None:
     assert len(data["investment_checklist"]) >= 5
     assert data["explanation"]
     assert data["educational_message"]
+    assert data["warning_summary"] is not None
+    assert data["warning_summary"]["severity"] in {"medium", "high"}
+    assert data["warning_summary"]["title"]
+    assert data["warning_summary"]["recommended_action"]

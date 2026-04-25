@@ -1,7 +1,7 @@
 from typing import Literal
 
 from pydantic import BaseModel, Field
-
+from app.schemas.warning import UserWarning
 
 ScamLabel = Literal["safe", "suspicious", "scam"]
 RiskLevel = Literal["low", "medium", "high"]
@@ -38,7 +38,7 @@ class ScamPredictionResponse(BaseModel):
     investment_checklist: list[InvestmentChecklistItem]
     explanation: str
     educational_message: str
-
+    warning_summary: UserWarning | None = None
 
 class ScamTrainingExample(BaseModel):
     text: str

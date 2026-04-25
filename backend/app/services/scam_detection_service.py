@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Any
-
+from app.services.warning_explanation_service import build_warning_from_scam_prediction
 import joblib
 
 from app.ml.scam_detection.train_model import MODEL_PATH, train_and_save_model
@@ -113,7 +113,7 @@ def predict_scam_risk(text: str) -> ScamPredictionResponse:
 
     risk_level = map_probability_to_risk_level(scam_probability)
 
-    return ScamPredictionResponse(
+    prediction = ScamPredictionResponse(
         input_text=text,
         predicted_label=predicted_label,
         scam_probability=scam_probability,
@@ -130,3 +130,7 @@ def predict_scam_risk(text: str) -> ScamPredictionResponse:
             risk_level=risk_level,
         ),
     )
+
+    prediction.warning_summary = build_warning_from_scam_prediction(prediction)
+
+    return prediction

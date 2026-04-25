@@ -36,3 +36,6 @@ def test_predict_scam_risk_returns_high_risk_for_obvious_scam() -> None:
     assert len(result.warning_signals) >= 1
     assert len(result.investment_checklist) >= 5
     assert "educational" not in result.educational_message.lower() or result.educational_message
+    assert result.warning_summary is not None
+    assert result.warning_summary.severity in {"medium", "high"}
+    assert result.warning_summary.title
