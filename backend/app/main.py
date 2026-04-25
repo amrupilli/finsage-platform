@@ -1,6 +1,7 @@
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
+from app.api import reports
 from sqlalchemy.orm import Session
 from app.api import warnings
 from app.api.auth import router as auth_router
@@ -29,6 +30,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(onboarding_router)
 app.include_router(warnings.router)
+app.include_router(reports.router)
 
 # Health endpoints (UNCHANGED)
 @app.get("/health")
