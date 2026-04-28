@@ -9,7 +9,6 @@ from app.services.onboarding_state import (
     get_missing_fields,
 )
 
-
 def create_onboarding_session(db: Session, user_id: int) -> OnboardingSession:
     session = OnboardingSession(
         user_id=user_id,
@@ -99,3 +98,29 @@ def mark_onboarding_session_completed(
     db.commit()
     db.refresh(session)
     return session
+
+def get_onboarding_answer_by_id(
+    db: Session,
+    answer_id: int,
+    session_id: int,
+) -> OnboardingAnswer | None:
+    return (
+        db.query(OnboardingAnswer)
+        .filter(
+            OnboardingAnswer.id == answer_id,
+            OnboardingAnswer.session_id == session_id,
+        )
+        .first()
+    )
+
+
+def update_onboarding_answer(
+    db: Session,
+    answer: OnboardingAnswer,
+    answer_text: str,
+) -> OnboardingAnswer:
+    answer.answer_text = answer_text
+    db.add(answer)
+    db.commit()
+    db.refresh(answer)
+    return answer

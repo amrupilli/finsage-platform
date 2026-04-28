@@ -55,3 +55,35 @@ class OnboardingStartResponse(BaseModel):
     current_stage: ConversationStage
     missing_fields: list[str]
     is_completed: bool
+
+class OnboardingAnswerResponse(BaseModel):
+    answer_id: int
+    question_key: str
+    field_name: str | None = None
+    answer_text: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class OnboardingAnswersReviewResponse(BaseModel):
+    session_id: int
+    is_completed: bool
+    current_stage: ConversationStage
+    missing_fields: list[str]
+    collected_fields: dict[str, str | None]
+    answers: list[OnboardingAnswerResponse]
+
+
+class OnboardingAnswerUpdateRequest(BaseModel):
+    answer_text: str = Field(..., min_length=1)
+
+
+class OnboardingAnswerUpdateResponse(BaseModel):
+    session_id: int
+    answer: OnboardingAnswerResponse
+    current_stage: ConversationStage
+    missing_fields: list[str]
+    collected_fields: dict[str, str | None]
+    is_completed: bool
+    message: str

@@ -69,3 +69,41 @@ def test_scam_check_returns_prediction_for_authenticated_user() -> None:
     assert data["warning_summary"]["severity"] in {"medium", "high"}
     assert data["warning_summary"]["title"]
     assert data["warning_summary"]["recommended_action"]
+
+def test_investment_check_requires_authentication() -> None:
+    response = client.post(
+        "/warnings/investment-check",
+        json={
+            "input_text": "Should I invest in XRP because people say it will go up?",
+        },
+    )
+
+    assert response.status_code in {401, 403}
+
+
+def test_investment_check_returns_response_for_authenticated_user() -> None:
+    headers = register_and_login_user()
+
+    response = client.post(
+        "/warnings/investment-check",
+        json={
+            "input_text": "Should I invest in XRP because people say it will go up?",
+        },
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["input_text"]
+    assert data["risk_level"]
+    assert data["summary"]
+    assert data["educational_message"]
+    assert len(data["checklist"]) >= 5
+
+    first_item = data["checklist"][0]
+
+    assert first_item["title"]
+    assert first_item["status"]
+    assert first_item["explanation"]
